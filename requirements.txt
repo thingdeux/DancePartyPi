@@ -1,0 +1,2 @@
+SpeechRecognition==3.4.6
+pyglet==1.2.4
