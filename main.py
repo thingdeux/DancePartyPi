@@ -7,13 +7,11 @@ import threading
 
 dance_party_audio = AudioPlayer()
 
-# Called on the background thread
+# NOTE: Called on a background thread
 def onAudioReceived(recognizer, audio):
     # received audio data, now we'll recognize it using Google Speech Recognition
     try:
-        # for testing purposes, just using the default API key
-        # to use another API key, use `r.recognize_google(audio, key="GOOGLE_SPEECH_RECOGNITION_API_KEY")`
-        # instead of `r.recognize_google(audio)`
+        # Keyword argument 'key' can be passed to recognize_google to use API key for cloud speech.
         recognized_audio = recognizer.recognize_google(audio)
         # recognized_audio = recognizer.recognize_sphinx(audio)
         print("Google Speech Recognition thinks you said " + recognized_audio)
@@ -31,18 +29,19 @@ if __name__ == '__main__':
         dance_party_audio.load_audio()
         recognizer = Recognizer()
         recognizer.energy_threshold = 200
-        # recognizer.pause_threshold = 0.3
-        # recognizer.non_speaking_duration = 0.3
 
         microphone = Microphone()
         with microphone as source:
-            recognizer.adjust_for_ambient_noise(source)  # we only need to calibrate once, before we start listening
+            recognizer.adjust_for_ambient_noise(source)
 
-        # start listening in the background
+        # start listening on the mic
         stop_listening = recognizer.listen_in_background(microphone, onAudioReceived)
         while True:
+            # "Block" the main thread ... will run additional logic to handle
+            # Hardware here - TODO
             time.sleep(0.1)
-        stop_listening()  # calling this function requests that the background listener stop listening
+        # Kill the background listener stop listening
+        stop_listening()
     except DancePartyAudioLoadError as error:
         print(error)
 
